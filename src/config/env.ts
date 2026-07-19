@@ -5,13 +5,18 @@ const optionalString = z.preprocess(
   z.string().optional(),
 );
 
+const optionalPort = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.coerce.number().int().positive().default(3000),
+);
+
 const schema = z.object({
   TELEGRAM_BOT_TOKEN: optionalString,
   TELEGRAM_WEBHOOK_SECRET: optionalString,
   BOT_MODE: z.enum(["polling", "webhook"]).default("polling"),
-  PORT: z.coerce.number().int().positive().default(3000),
-  AI_GATEWAY_API_KEY: optionalString,
-  AI_MODEL: z.string().default("google/gemini-3.5-flash"),
+  PORT: optionalPort,
+  GEMINI_API_KEY: optionalString,
+  GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
   TURSO_DATABASE_URL: z.string().default("file:local.db"),
   TURSO_AUTH_TOKEN: optionalString,
   GITHUB_TOKEN: optionalString,
@@ -21,7 +26,13 @@ const schema = z.object({
   DEFAULT_RSS_FEEDS: z.string().default(""),
 });
 
-export const env = schema.parse(process.env);
+// Legacy variables allow an existing local setup to keep working while it is
+// renamed to GEMINI_API_KEY and GEMINI_MODEL. Calls are made directly to Google.
+export const env = schema.parse({
+  ...process.env,
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? process.env.AI_GATEWAY_API_KEY,
+  GEMINI_MODEL: process.env.GEMINI_MODEL ?? process.env.AI_MODEL?.replace(/^google\//, ""),
+});
 
 export const defaultRssFeeds = env.DEFAULT_RSS_FEEDS.split(",")
   .map((feed) => feed.trim())
