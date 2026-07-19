@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.local
+.env.*
+.trigger/
+.eve/
+.output/
+dist/
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
