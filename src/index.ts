@@ -1,9 +1,17 @@
 import { webhookCallback } from "grammy";
 import { env } from "./config/env";
-import { createTelegramBot } from "./bot/bot";
+import { createTelegramBot, telegramCommands } from "./bot/bot";
 
 const bot = env.TELEGRAM_BOT_TOKEN ? createTelegramBot(env.TELEGRAM_BOT_TOKEN) : undefined;
-const webhook = bot ? webhookCallback(bot, "bun") : undefined;
+const webhook = bot && env.BOT_MODE === "webhook" ? webhookCallback(bot, "bun") : undefined;
+
+if (bot) {
+  try {
+    await bot.api.setMyCommands(telegramCommands);
+  } catch (error) {
+    console.error("Could not register Telegram command menu", error);
+  }
+}
 
 if (bot && env.BOT_MODE === "polling") {
   void bot.start({
@@ -20,7 +28,7 @@ const server = Bun.serve({
         ok: true,
         telegramConfigured: Boolean(bot),
         botMode: env.BOT_MODE,
-        aiConfigured: Boolean(env.AI_GATEWAY_API_KEY),
+        geminiConfigured: Boolean(env.GEMINI_API_KEY),
         timestamp: new Date().toISOString(),
       });
     }
