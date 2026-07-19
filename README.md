@@ -1,4 +1,4 @@
-# Signal Scout
+# evee
 
 A Telegram-first AI opportunity agent that learns a product and continuously finds public conversations where that product can genuinely help.
 
