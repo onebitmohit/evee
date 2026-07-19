@@ -1,5 +1,5 @@
 import { defineAgent } from "eve";
 
 export default defineAgent({
-  model: process.env.AI_MODEL ?? "google/gemini-3.5-flash",
+  model: process.env.EVE_MODEL ?? "google/gemini-2.5-flash",
 });
