@@ -11,7 +11,7 @@ It never posts public replies on a user's behalf.
 - Bun + TypeScript backend
 - grammY Telegram bot (long polling locally, webhook-ready in production)
 - Vercel Eve agent definition and typed tools
-- Vercel AI SDK 7 structured outputs with Zod
+- Direct Google Gemini SDK structured outputs with Zod
 - Turso/libSQL + Drizzle ORM
 - Trigger.dev scheduled monitoring, fan-out jobs, retries, concurrency, and hourly digest dispatch
 
@@ -21,16 +21,16 @@ It never posts public replies on a user's behalf.
 2. Trigger.dev fans out a monitoring job for each active user every 20 minutes.
 3. Source collectors normalize public conversations into a shared model and deduplicate them in Turso.
 4. A cheap lexical/intent prefilter limits AI work to plausible candidates.
-5. AI SDK returns a Zod-validated analysis with intent, fit, urgency, specificity, reply-safety, confidence, evidence, risks, and a draft.
+5. Gemini returns a Zod-validated analysis with intent, fit, urgency, specificity, reply-safety, confidence, evidence, risks, and a draft.
 6. Opportunities over the user's threshold arrive in Telegram with source links and feedback controls.
 7. `Useful`, `Not a fit`, `Rewrite`, and `I replied` feedback is saved and included in later analysis prompts.
 8. Trigger.dev checks each user's local timezone hourly and sends one daily digest.
 
-When `AI_GATEWAY_API_KEY` is absent, local scans use a deterministic scoring and drafting fallback. This makes collectors, storage, Telegram, and jobs testable before AI credentials are added.
+When `GEMINI_API_KEY` is absent, local scans use a deterministic scoring and drafting fallback. This makes collectors, storage, Telegram, and jobs testable before AI credentials are added.
 
 ## Setup
 
-Prerequisites: Bun, Node.js 24+ for the Eve CLI, a Telegram bot token from BotFather, a Turso database (or local libSQL), a Vercel AI Gateway key, and a Trigger.dev project. The backend itself runs on Bun; Node 24 is only required by Eve's current development CLI.
+Prerequisites: Bun, Node.js 24+ for the Eve CLI, a Telegram bot token from BotFather, a Turso database (or local libSQL), a Google AI Studio Gemini key, and a Trigger.dev project. The backend itself runs on Bun; Node 24 is only required by Eve's current development CLI.
 
 ```bash
 bun install
@@ -43,8 +43,8 @@ Fill in `.env`:
 ```dotenv
 TELEGRAM_BOT_TOKEN=...
 BOT_MODE=polling
-AI_GATEWAY_API_KEY=...
-AI_MODEL=google/gemini-3.5-flash
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.5-flash
 TURSO_DATABASE_URL=libsql://your-db.turso.io
 TURSO_AUTH_TOKEN=...
 TRIGGER_SECRET_KEY=tr_dev_...
@@ -104,7 +104,7 @@ The Eve agent lives in [`agent/`](./agent) with safety and behavior instructions
 bun run eve:dev
 ```
 
-grammY owns the Telegram transport, while Eve supplies the portable agent definition/tool surface and AI SDK supplies the structured opportunity workflow used by background monitoring.
+grammY owns the Telegram transport, while Eve supplies the optional portable agent definition/tool surface. Telegram monitoring and draft generation call Google Gemini directly through Google's official SDK; they do not use Vercel AI Gateway.
 
 ## RSS feeds
 
