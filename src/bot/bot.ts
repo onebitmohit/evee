@@ -40,6 +40,19 @@ const nextStep: Record<string, string> = {
   exclusions: "complete",
 };
 
+export const telegramCommands = [
+  { command: "start", description: "Start or resume onboarding" },
+  { command: "setup", description: "Create or update your product profile" },
+  { command: "profile", description: "View what the agent learned" },
+  { command: "scan", description: "Scan public sources now" },
+  { command: "digest", description: "Show your latest opportunity digest" },
+  { command: "settings", description: "Configure digest time and score threshold" },
+  { command: "pause", description: "Pause monitoring alerts" },
+  { command: "resume", description: "Resume monitoring alerts" },
+  { command: "skip", description: "Skip an optional onboarding question" },
+  { command: "help", description: "Show all available commands" },
+] as const;
+
 async function userFromContext(ctx: Context) {
   if (!ctx.from || !ctx.chat) throw new Error("Telegram user and chat are required.");
   return ensureTelegramUser({
@@ -60,6 +73,24 @@ function profileSummary(profile: Awaited<ReturnType<typeof getProfile>>) {
     `<b>Style:</b> ${escapeHtml(profile.replyStyle)}\n` +
     `<b>Keywords:</b> ${escapeHtml(profile.keywords.join(", ") || "inferred from profile")}\n` +
     `<b>Exclusions:</b> ${escapeHtml(profile.exclusions.join(", ") || "—")}`;
+}
+
+async function completeOnboarding(userId: string, data: Record<string, unknown>) {
+  const input = profileInputSchema.parse({
+    productName: data.product_name,
+    productUrl: data.product_url,
+    productSummary: data.product_summary,
+    targetCustomers: data.target_customers,
+    painPoints: data.pain_points,
+    competitors: data.competitors ?? [],
+    replyStyle: data.reply_style,
+    keywords: data.keywords ?? [],
+    exclusions: data.exclusions ?? [],
+  } satisfies Record<string, unknown>) as ProfileInput;
+  const profile = await saveProfile(userId, input);
+  await provisionDefaultSources(userId, defaultRssFeeds);
+  await setOnboarding(userId, "complete", {});
+  return profile;
 }
 
 export function createTelegramBot(token: string) {
@@ -92,8 +123,18 @@ export function createTelegramBot(token: string) {
     }
     const data = current.onboardingData;
     const step = nextStep[current.onboardingStep]!;
-    await setOnboarding(user.id, step, data);
-    await ctx.reply(questions[step]!);
+    if (step !== "complete") {
+      await setOnboarding(user.id, step, data);
+      await ctx.reply(questions[step]!);
+      return;
+    }
+    try {
+      const profile = await completeOnboarding(user.id, data);
+      await ctx.reply(`Profile ready for <b>${escapeHtml(profile.productName)}</b>. I’ll score public conversations, explain the fit, and draft replies without ever posting for you.\n\nUse /scan for the first scan.`, { parse_mode: "HTML" });
+    } catch (error) {
+      await setOnboarding(user.id, "product_name", {});
+      await ctx.reply(`I couldn’t save that profile (${error instanceof Error ? error.message : "invalid details"}). Let’s retry. ${questions.product_name}`);
+    }
   });
 
   bot.command("profile", async (ctx) => {
@@ -138,6 +179,16 @@ export function createTelegramBot(token: string) {
 
   bot.command("scan", async (ctx) => {
     const user = await userFromContext(ctx);
+    const profile = await getProfile(user.id);
+    if (!profile) {
+      const current = await getUser(user.id);
+      const step = current?.onboardingStep && current.onboardingStep !== "complete"
+        ? current.onboardingStep
+        : "product_name";
+      if (step === "product_name") await setOnboarding(user.id, step, current?.onboardingData ?? {});
+      await ctx.reply(`Before I can scan, I need to finish learning your product.\n\n${questions[step] ?? questions.product_name}`);
+      return;
+    }
     await ctx.reply("Scanning Reddit, Hacker News, GitHub, and your RSS feeds now…");
     try {
       const result = await monitorUser(user.id);
@@ -203,20 +254,7 @@ export function createTelegramBot(token: string) {
     }
 
     try {
-      const input = profileInputSchema.parse({
-        productName: data.product_name,
-        productUrl: data.product_url,
-        productSummary: data.product_summary,
-        targetCustomers: data.target_customers,
-        painPoints: data.pain_points,
-        competitors: data.competitors ?? [],
-        replyStyle: data.reply_style,
-        keywords: data.keywords ?? [],
-        exclusions: data.exclusions ?? [],
-      } satisfies Record<string, unknown>) as ProfileInput;
-      const profile = await saveProfile(user.id, input);
-      await provisionDefaultSources(user.id, defaultRssFeeds);
-      await setOnboarding(user.id, "complete", {});
+      const profile = await completeOnboarding(user.id, data);
       await ctx.reply(`Profile ready for <b>${escapeHtml(profile.productName)}</b>. I’ll score public conversations, explain the fit, and draft replies without ever posting for you.\n\nUse /scan for the first scan.`, { parse_mode: "HTML" });
     } catch (error) {
       await setOnboarding(user.id, "product_name", {});
