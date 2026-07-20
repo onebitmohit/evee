@@ -1,0 +1,23 @@
+{
+  "name": "@evee/auth",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "latest",
+    "@evee/platform": "workspace:*",
+    "better-auth": "latest",
+    "drizzle-orm": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "typescript": "^5.9.3"
+  }
+}
