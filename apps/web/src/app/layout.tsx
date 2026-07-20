@@ -9,6 +9,7 @@ const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 export const metadata: Metadata = {
   title: { default: "Evee", template: "%s | Evee" },
   description: "AI GTM workspace for finding and acting on high-intent demand.",
+  icons: { icon: "/brand/evee-logo.png", apple: "/brand/evee-logo.png" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
