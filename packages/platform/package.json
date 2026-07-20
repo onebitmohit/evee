@@ -1,0 +1,26 @@
+{
+  "name": "@evee/platform",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@google/genai": "latest",
+    "@libsql/client": "latest",
+    "drizzle-orm": "latest",
+    "dotenv": "latest",
+    "fast-xml-parser": "latest",
+    "grammy": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
+  }
+}

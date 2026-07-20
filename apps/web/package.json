@@ -1,0 +1,32 @@
+{
+  "name": "@evee/web",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@evee/auth": "workspace:*",
+    "@evee/platform": "workspace:*",
+    "@next/env": "latest",
+    "@phosphor-icons/react": "latest",
+    "@tailwindcss/postcss": "latest",
+    "better-auth": "latest",
+    "eve": "latest",
+    "next": "latest",
+    "next-themes": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tailwindcss": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "^5.9.3"
+  }
+}
