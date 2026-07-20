@@ -13,7 +13,7 @@
     "db:migrate": "bun src/db/migrate.ts",
     "trigger:dev": "bunx trigger.dev@latest dev",
     "trigger:deploy": "bunx trigger.dev@latest deploy",
-    "eve:dev": "fnm exec --using=24 node node_modules/eve/bin/eve.js dev"
+    "eve:dev": "node node_modules/eve/bin/eve.js dev"
   },
   "dependencies": {
     "@google/genai": "latest",
