@@ -31,28 +31,31 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   }
 
   return (
-    <form onSubmit={submit} className="mt-7 grid gap-4">
-      {mode === "sign-up" && (
-        <label className="grid gap-1.5 text-[10px] font-semibold">
-          Name
-          <input name="name" required autoComplete="name" className="h-10 rounded-[8px] border bg-[var(--surface)] px-3 text-xs font-normal placeholder:text-[var(--text-faint)] focus:border-[var(--accent)]" placeholder="Your name" />
+    <form onSubmit={submit} className="auth-form">
+      {mode === "sign-up" ? (
+        <label className="auth-field">
+          <span>Name</span>
+          <input name="name" required autoComplete="name" placeholder="Your name" />
         </label>
-      )}
-      <label className="grid gap-1.5 text-[10px] font-semibold">
-        Work email
-        <input name="email" type="email" required autoComplete="email" className="h-10 rounded-[8px] border bg-[var(--surface)] px-3 text-xs font-normal placeholder:text-[var(--text-faint)] focus:border-[var(--accent)]" placeholder="you@company.com" />
+      ) : null}
+      <label className="auth-field">
+        <span>Work email</span>
+        <input name="email" type="email" required autoComplete="email" placeholder="you@company.com" />
       </label>
-      <label className="grid gap-1.5 text-[10px] font-semibold">
-        Password
-        <input name="password" type="password" minLength={8} required autoComplete={mode === "sign-in" ? "current-password" : "new-password"} className="h-10 rounded-[8px] border bg-[var(--surface)] px-3 text-xs font-normal placeholder:text-[var(--text-faint)] focus:border-[var(--accent)]" placeholder="At least 8 characters" />
+      <label className="auth-field">
+        <span>Password</span>
+        <input name="password" type="password" minLength={8} required autoComplete={mode === "sign-in" ? "current-password" : "new-password"} placeholder="At least 8 characters" />
       </label>
-      {error && <p role="alert" className="rounded-[8px] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)] px-3 py-2.5 text-xs text-[var(--danger)]">{error}</p>}
-      <button disabled={pending} className="flex h-10 items-center justify-center gap-2 rounded-[8px] bg-[var(--accent)] px-4 text-xs font-semibold text-[var(--accent-foreground)] transition hover:bg-[var(--accent-hover)] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60">
-        {pending ? <CircleNotch className="animate-spin" size={17} /> : <>{mode === "sign-in" ? "Sign in" : "Create workspace"}<ArrowRight size={16} /></>}
-      </button>
-      <p className="text-center text-[11px] text-[var(--text-muted)]">
+      {error ? <p role="alert" className="auth-form-error">{error}</p> : null}
+      <div className="auth-form-actions">
+        <p>Protected by your workspace credentials.</p>
+        <button disabled={pending} className="auth-submit-button">
+          {pending ? <CircleNotch className="animate-spin" size={20} /> : <><span>{mode === "sign-in" ? "Sign in" : "Create"}</span><ArrowRight size={19} /></>}
+        </button>
+      </div>
+      <p className="auth-form-switch">
         {mode === "sign-in" ? "New to Evee?" : "Already have an account?"}{" "}
-        <Link className="font-medium text-[var(--text)] underline decoration-[var(--border-strong)] underline-offset-4 hover:decoration-[var(--text)]" href={mode === "sign-in" ? "/sign-up" : "/sign-in"}>
+        <Link href={mode === "sign-in" ? "/sign-up" : "/sign-in"}>
           {mode === "sign-in" ? "Create a workspace" : "Sign in"}
         </Link>
       </p>
