@@ -4,7 +4,9 @@ node_modules/
 .env.*
 .trigger/
 .eve/
+.turbo/
 .output/
+.next/
 dist/
 *.db
 *.db-shm
