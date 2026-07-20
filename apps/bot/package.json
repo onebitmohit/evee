@@ -1,0 +1,20 @@
+{
+  "name": "@evee/bot",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "BOT_MODE=polling bun --watch src/index.ts",
+    "start": "BOT_MODE=polling bun src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@evee/platform": "workspace:*",
+    "grammy": "latest"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
+  }
+}
