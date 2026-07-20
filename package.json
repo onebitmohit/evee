@@ -49,8 +49,7 @@
     "drizzle-kit": "latest",
     "trigger.dev": "latest",
     "turbo": "latest",
-    "typescript": "^5.9.3",
-    "vercel": "^56.3.2"
+    "typescript": "^5.9.3"
   },
   "optionalDependencies": {
     "@libsql/darwin-arm64": "0.5.29",
