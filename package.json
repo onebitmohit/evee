@@ -16,6 +16,7 @@
     "dev:web": "fnm exec --using=24 bun --cwd apps/web dev",
     "dev:bot": "BOT_MODE=polling bun --env-file=.env --env-file=apps/bot/.env.local --watch apps/bot/src/index.ts",
     "bot": "BOT_MODE=polling bun --env-file=.env --env-file=apps/bot/.env.local apps/bot/src/index.ts",
+    "start": "bun apps/bot/src/index.ts",
     "build": "bun run eve:build && turbo build",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
@@ -24,8 +25,8 @@
     "trigger:dev": "bunx trigger.dev@latest dev",
     "trigger:deploy": "bunx trigger.dev@latest deploy",
     "eve:dev": "fnm exec --using=24 node node_modules/eve/bin/eve.js dev",
-    "eve:build": "fnm exec --using=24 node node_modules/eve/bin/eve.js build",
-    "eve:start": "fnm exec --using=24 node node_modules/eve/bin/eve.js start"
+    "eve:build": "node node_modules/eve/bin/eve.js build",
+    "eve:start": "node node_modules/eve/bin/eve.js start"
   },
   "dependencies": {
     "@ai-sdk/google": "latest",
