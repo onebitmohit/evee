@@ -1,135 +1,174 @@
-# evee
+# Evee
 
-A Telegram-first AI opportunity agent that learns a product and continuously finds public conversations where that product can genuinely help.
+Evee is a full-stack AI GTM workspace. It finds relevant public conversations, explains why they matter, drafts useful replies, and keeps the same opportunities, monitors, feedback, and alerts synchronized between a web dashboard and Telegram.
 
-Signal Scout monitors Reddit, Hacker News, GitHub, and configurable RSS feeds. It filters and deduplicates conversations, scores high-intent opportunities with a structured AI workflow, explains the evidence, drafts a transparent personalized reply, sends Telegram alerts and daily digests, and uses button feedback to improve later ranking and writing.
+Evee never posts a public reply on a user's behalf.
 
-It never posts public replies on a user's behalf.
+## Product surfaces
+
+- Web dashboard for business profiles, monitors, opportunities, the GTM copilot, integrations, analytics, billing state, and settings
+- Telegram companion for instant alerts, reply drafts, quick feedback, manual scans, and daily digests
+- Secure, expiring, one-time codes for linking a Telegram identity to an authenticated web workspace
+- Light and dark themes with a responsive application shell
+- Shared Turso data model so web, Telegram, Eve, and Trigger.dev operate on the same workspace
 
 ## Stack
 
-- Bun + TypeScript backend
-- grammY Telegram bot (long polling locally, webhook-ready in production)
-- Vercel Eve agent definition and typed tools
-- Direct Google Gemini SDK structured outputs with Zod
-- Turso/libSQL + Drizzle ORM
-- Trigger.dev scheduled monitoring, fan-out jobs, retries, concurrency, and hourly digest dispatch
+| Technology | Purpose |
+| --- | --- |
+| Next.js + Tailwind CSS | Web application and design system |
+| Bun + TypeScript | Monorepo runtime, scripts, and type-safe application code |
+| Better Auth | Email/password authentication and sessions |
+| Turso + Drizzle ORM | Multi-tenant application data and migrations |
+| Vercel Eve | Durable GTM copilot sessions, instructions, and tools |
+| Vercel AI SDK + Google provider | Direct Gemini 2.5 Flash access for Eve |
+| Google Gen AI SDK + Zod | Structured opportunity analysis in the monitoring pipeline |
+| Trigger.dev | Scheduled scans, retries, fan-out work, and daily digests |
+| grammY | Telegram bot transport and commands |
 
-## How it works
+## Monorepo layout
 
-1. The Telegram onboarding learns the product, URL, audience, pain points, competitors, reply style, keywords, and exclusions.
-2. Trigger.dev fans out a monitoring job for each active user every 20 minutes.
-3. Source collectors normalize public conversations into a shared model and deduplicate them in Turso.
-4. A cheap lexical/intent prefilter limits AI work to plausible candidates.
-5. Gemini returns a Zod-validated analysis with intent, fit, urgency, specificity, reply-safety, confidence, evidence, risks, and a draft.
-6. Opportunities over the user's threshold arrive in Telegram with source links and feedback controls.
-7. `Useful`, `Not a fit`, `Rewrite`, and `I replied` feedback is saved and included in later analysis prompts.
-8. Trigger.dev checks each user's local timezone hourly and sends one daily digest.
+```text
+apps/
+  web/                 Next.js dashboard and API routes
+  bot/                 Telegram bot process
+packages/
+  auth/                Better Auth configuration
+  platform/            database, collectors, analysis, and services
+  jobs/                Trigger.dev tasks
+agent/                  Eve agent, instructions, channel auth, and tools
+drizzle/                generated SQL migrations
+```
 
-When `GEMINI_API_KEY` is absent, local scans use a deterministic scoring and drafting fallback. This makes collectors, storage, Telegram, and jobs testable before AI credentials are added.
+## Local setup
 
-## Setup
+Prerequisites:
 
-Prerequisites: Bun, Node.js 24+ for the Eve CLI, a Telegram bot token from BotFather, a Turso database (or local libSQL), a Google AI Studio Gemini key, and a Trigger.dev project. The backend itself runs on Bun; Node 24 is only required by Eve's current development CLI.
+- Bun 1.3+
+- Node.js 24 (required by the Eve CLI)
+- A Telegram bot token from BotFather
+- A direct Gemini API key from Google AI Studio
+- A Turso database, or `file:local.db` for local-only development
+- A Trigger.dev project for scheduled jobs
+
+Install dependencies and create your local environment file:
 
 ```bash
+fnm use 24
 bun install
 cp .env.example .env
 bun run db:migrate
 ```
 
-Fill in `.env`:
+If `.env.example` is intentionally ignored in your clone, create `.env` with these values:
 
 ```dotenv
-TELEGRAM_BOT_TOKEN=...
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_WEBHOOK_SECRET=
+TELEGRAM_LINK_SECRET=replace-with-a-long-random-secret
 BOT_MODE=polling
-GEMINI_API_KEY=...
+PORT=3000
+
+BETTER_AUTH_SECRET=replace-with-a-long-random-secret
+BETTER_AUTH_URL=http://localhost:3001
+
+GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.5-flash
-TURSO_DATABASE_URL=libsql://your-db.turso.io
-TURSO_AUTH_TOKEN=...
-TRIGGER_SECRET_KEY=tr_dev_...
-TRIGGER_PROJECT_REF=proj_...
+
+TURSO_DATABASE_URL=file:local.db
+TURSO_AUTH_TOKEN=
+
+GITHUB_TOKEN=
+REDDIT_USER_AGENT=evee/0.2 opportunity monitor
+
+TRIGGER_SECRET_KEY=
+TRIGGER_PROJECT_REF=
+
+DEFAULT_RSS_FEEDS=
 ```
 
-For local-only storage, leave `TURSO_DATABASE_URL=file:local.db` and the auth token blank.
+Generate the two application secrets with `openssl rand -base64 32`. Use the same `TELEGRAM_LINK_SECRET` in the web and bot runtimes. Do not reuse an AI Gateway key as `GEMINI_API_KEY`; Evee calls Google directly.
 
-Start the Telegram bot and health server:
+## Start the project
+
+Run each long-lived process in its own terminal:
 
 ```bash
+# Terminal 1: dashboard + embedded Eve runtime (the script pins Node 24 through fnm)
+bun run dev:web
+
+# Terminal 2: Telegram bot
 bun run bot
-```
 
-Then open the bot and send `/start`. Useful commands:
-
-- `/setup` rebuilds the product profile.
-- `/profile` shows what the agent learned.
-- `/scan` immediately scans all enabled sources.
-- `/digest` sends the current digest.
-- `/settings 9 Asia/Kolkata 70` sets local digest hour, timezone, and alert threshold.
-- `/pause` and `/resume` control automated alerts without deleting history.
-
-## Telegram webhook deployment
-
-Set `BOT_MODE=webhook`, expose `POST /telegram/webhook`, and configure Telegram with the same secret stored in `TELEGRAM_WEBHOOK_SECRET`. Requests are validated against Telegram's `X-Telegram-Bot-Api-Secret-Token` header.
-
-The health endpoint is `GET /health`.
-
-## Trigger.dev
-
-Replace the placeholder project ref through `TRIGGER_PROJECT_REF`, then run:
-
-```bash
+# Terminal 3: scheduled jobs
 bun run trigger:dev
 ```
 
-Deploy jobs with:
+Open [http://localhost:3001](http://localhost:3001), create an account, then connect Telegram from **Dashboard > Integrations**. In Telegram, send the generated command:
+
+```text
+/link YOUR_CODE
+```
+
+The code expires after ten minutes, is stored only as a hash, can be used once, and is invalidated when a replacement code is created.
+
+For a production-like local run, build both services first, then run the Eve service on port `4274` beside `next start`:
 
 ```bash
-bun run trigger:deploy
+fnm use 24
+bun run build
+
+# Terminal 1
+NODE_ENV=production bun run eve:start -- --port 4274
+
+# Terminal 2
+bun --cwd apps/web start
 ```
 
-The tasks are:
+On Vercel, `withEve` packages the web app and Eve runtime into the same project, so the separate local sidecar command is not needed.
 
-- `schedule-opportunity-monitoring`: every 20 minutes; fans out per-user jobs.
-- `monitor-user-opportunities`: per-user collection, analysis, storage, and Telegram alert dispatch with exponential retries.
-- `schedule-daily-telegram-digests`: hourly timezone-aware digest check.
+## Telegram commands
 
-Trigger.dev dev schedules only fire while its local CLI is running.
+- `/start` - welcome and command guide
+- `/link CODE` - connect Telegram to a web workspace
+- `/setup` - create or update the business profile
+- `/profile` - view the business context known by Evee
+- `/scan` - scan enabled public sources now
+- `/digest` - receive the current opportunity digest
+- `/settings 9 Asia/Kolkata 70` - set digest hour, timezone, and score threshold
+- `/pause` and `/resume` - control automated alerts
+- `/help` - show all commands
 
-## Eve
+The bot registers these commands with Telegram so they appear in the command menu.
 
-The Eve agent lives in [`agent/`](./agent) with safety and behavior instructions plus tools to read a product profile, run an opportunity scan, and record feedback.
+## AI and automation boundaries
 
-```bash
-bun run eve:dev
-```
+Eve is the intelligent GTM copilot. It understands the business, turns natural-language intent into monitors, plans research, explains opportunity relevance, drafts replies, answers GTM questions, and uses feedback to improve recommendations.
 
-grammY owns the Telegram transport, while Eve supplies the optional portable agent definition/tool surface. Telegram monitoring and draft generation call Google Gemini directly through Google's official SDK; they do not use Vercel AI Gateway.
+Authentication, workspace authorization, billing state, CRUD operations, schedules, retries, and notification delivery remain deterministic application code. Trigger.dev runs monitoring every twenty minutes and checks hourly for timezone-aware daily digests.
 
-## RSS feeds
+Collectors are implemented for Reddit, Hacker News, GitHub, and RSS. Telegram is implemented as the companion channel. Slack, email, and X are represented as workspace integrations and require their provider credentials and authorization flows before delivery or collection can be enabled. X capabilities also depend on the API access granted to the account.
 
-Set `DEFAULT_RSS_FEEDS` to comma-separated feed URLs before a user finishes onboarding. Each feed becomes a separate source for that user:
-
-```dotenv
-DEFAULT_RSS_FEEDS=https://example.com/feed.xml,https://another.example/rss
-```
-
-More source-management commands can be added on top of the existing `sources` table without changing the monitoring pipeline.
-
-## Quality checks
+## Useful commands
 
 ```bash
 bun run typecheck
-bun test
+bun run test
+bun run build
+bun run db:generate
+bun run db:migrate
+bun run trigger:deploy
+bun run eve:dev
+bun run eve:build
+bun run eve:start
 ```
 
-The database schema is in `src/db/schema.ts`; generated migrations are committed under `drizzle/`.
+## Production checklist
 
-## Production notes
-
-- Add a GitHub token to increase search rate limits.
-- Keep the Reddit user agent descriptive and identify the service accurately.
-- AI output is treated as a recommendation, not an authorization to post.
-- Public source content is explicitly marked untrusted in the model prompt to reduce prompt-injection risk.
-- Source failures are isolated, recorded on monitor runs, and retried by Trigger.dev.
-- Tune per-user thresholds and source queries before increasing scan frequency or AI volume.
+- Use strong, different production values for Better Auth and Telegram linking secrets.
+- Set the same Turso credentials in the web, bot, Eve, and Trigger.dev environments.
+- Set `BETTER_AUTH_URL` to the public HTTPS origin.
+- Run the Telegram bot in webhook mode and validate Telegram's secret-token header.
+- Configure provider authorization before marking Slack, email, or X as connected.
+- Treat source content as untrusted and keep public posting behind explicit human approval.
+- Apply committed Drizzle migrations before serving production traffic.
