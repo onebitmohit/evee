@@ -167,7 +167,8 @@ bun run eve:start
 
 - Use strong, different production values for Better Auth and Telegram linking secrets.
 - Set the same Turso credentials in the web, bot, Eve, and Trigger.dev environments.
-- Set `BETTER_AUTH_URL` to the public HTTPS origin.
+- Set `BETTER_AUTH_URL` to the canonical public HTTPS origin, with no path (for example, `https://app.example.com`). This is required for login.
+- If users can open the app from another allowed hostname (for example a custom domain plus a Vercel deployment or preview URL), add each exact HTTPS origin to `BETTER_AUTH_TRUSTED_ORIGINS` as a comma-separated list, then redeploy. Do not use a wildcard or disable origin checks.
 - Run the Telegram bot in webhook mode and validate Telegram's secret-token header.
 - Configure provider authorization before marking Slack, email, or X as connected.
 - Treat source content as untrusted and keep public posting behind explicit human approval.
