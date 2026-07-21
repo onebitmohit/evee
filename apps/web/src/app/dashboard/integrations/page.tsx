@@ -1,44 +1,70 @@
-import { getTelegramConnection, listWorkspaceIntegrations } from "@evee/platform/db/workspaces";
-import { Envelope, GithubLogo, RedditLogo, Rss, SlackLogo, TelegramLogo, XLogo } from "@phosphor-icons/react/dist/ssr";
+import { getTelegramConnection } from "@evee/platform/db/workspaces";
+import { ArrowRight, GithubLogo, RedditLogo, Rss, TelegramLogo } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { TelegramLink } from "@/components/telegram-link";
 import { requireWorkspace } from "@/lib/session";
 
-const icons = { reddit: RedditLogo, github: GithubLogo, hackernews: Rss, rss: Rss, telegram: TelegramLogo, slack: SlackLogo, email: Envelope, x: XLogo };
-const sourceTypes = new Set(["reddit", "github", "hackernews", "rss"]);
+const sources = [
+  { label: "Reddit", icon: RedditLogo },
+  { label: "Hacker News", icon: Rss },
+  { label: "GitHub", icon: GithubLogo },
+  { label: "RSS", icon: Rss },
+];
 
-export const metadata = { title: "Integrations" };
+export const metadata = { title: "Connections" };
 
-export default async function IntegrationsPage() {
+export default async function ConnectionsPage() {
   const { workspace } = await requireWorkspace();
-  const [integrations, telegram] = await Promise.all([listWorkspaceIntegrations(workspace.id), getTelegramConnection(workspace.id)]);
-  const sources = integrations.filter((integration) => sourceTypes.has(integration.type));
-  const channels = integrations.filter((integration) => !sourceTypes.has(integration.type));
-  const connected = integrations.filter((integration) => integration.status === "connected").length;
-
-  const list = (items: typeof integrations) => (
-    <div className="divide-y">
-      {items.map((integration, index) => {
-        const Icon = icons[integration.type];
-        const source = sourceTypes.has(integration.type);
-        return (
-          <div key={integration.id} className="grid gap-3 px-4 py-3.5 sm:grid-cols-[28px_32px_minmax(0,1fr)_minmax(160px,auto)] sm:items-center">
-            <span className="hidden font-mono text-[8px] text-[var(--text-faint)] sm:block">{String(index + 1).padStart(2, "0")}</span>
-            <span className="grid size-8 place-items-center rounded-[7px] bg-[var(--surface-subtle)] text-[var(--text-muted)]"><Icon size={16} weight="fill" /></span>
-            <div className="min-w-0"><div className="flex items-center gap-2"><h2 className="text-xs font-semibold">{integration.displayName}</h2><span className={`text-[8px] font-semibold ${integration.status === "connected" ? "text-[var(--success)]" : "text-[var(--text-faint)]"}`}>{integration.status === "connected" ? "Connected" : "Not connected"}</span></div><p className="mt-1 text-[10px] leading-4 text-[var(--text-muted)]">{integration.type === "telegram" ? "Instant alerts, reply drafts, quick feedback, and daily digests." : source ? "Public signal monitoring with workspace-scoped queries and filters." : integration.type === "x" ? "Available where your X API access supports the required endpoints." : "Optional notification and collaboration delivery channel."}</p></div>
-            <div className="sm:text-right">{integration.type === "telegram" ? <TelegramLink initiallyConnected={Boolean(telegram)} username={telegram?.telegramUsername} /> : source ? <p className="text-[9px] text-[var(--text-faint)]">Managed in monitors</p> : <button disabled className="h-8 rounded-[7px] border px-3 text-[9px] font-semibold text-[var(--text-faint)]">Provider setup required</button>}</div>
-          </div>
-        );
-      })}
-    </div>
-  );
+  const telegram = await getTelegramConnection(workspace.id);
 
   return (
     <div className="grid gap-5">
-      <PageHeader title="Integrations" description="Connect signal sources and delivery channels. Credentials and authorization stay outside the agent prompt." />
-      <section className="grid overflow-hidden rounded-[10px] border bg-[var(--surface)] sm:grid-cols-3">{[["Available", integrations.length], ["Connected", connected], ["Delivery channels", channels.length]].map(([label, value]) => <div key={String(label)} className="border-r px-4 py-3.5 last:border-r-0 max-sm:border-b max-sm:border-r-0"><p className="text-[10px] text-[var(--text-faint)]">{label}</p><p className="mt-2 font-mono text-2xl leading-none tracking-[-0.05em]">{value}</p></div>)}</section>
-      <section className="overflow-hidden rounded-[10px] border bg-[var(--surface)]"><div className="border-b px-4 py-3.5"><h2 className="text-xs font-semibold">Signal sources</h2><p className="mt-0.5 text-[10px] text-[var(--text-faint)]">Public surfaces used to find relevant conversations</p></div>{list(sources)}</section>
-      <section className="overflow-hidden rounded-[10px] border bg-[var(--surface)]"><div className="border-b px-4 py-3.5"><h2 className="text-xs font-semibold">Delivery channels</h2><p className="mt-0.5 text-[10px] text-[var(--text-faint)]">Companion surfaces for alerts, digests, and team actions</p></div>{list(channels)}</section>
+      <PageHeader
+        title="Connections"
+        description="Manage the signal sources and delivery channel that are available in Evee today."
+      />
+
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+        <section className="overflow-hidden rounded-[10px] border bg-[var(--surface)]">
+          <div className="border-b px-4 py-3.5">
+            <h2 className="text-xs font-semibold">Signal sources</h2>
+            <p className="mt-0.5 text-[10px] text-[var(--text-faint)]">Sources available when creating a monitor</p>
+          </div>
+          <div className="grid grid-cols-2 gap-px bg-[var(--border)] sm:grid-cols-4 xl:grid-cols-2">
+            {sources.map((source) => (
+              <div key={source.label} className="flex items-center gap-2.5 bg-[var(--surface)] px-4 py-4">
+                <span className="grid size-8 place-items-center rounded-[8px] bg-[var(--surface-subtle)] text-[var(--text-muted)]">
+                  <source.icon size={16} weight="fill" />
+                </span>
+                <span className="text-[11px] font-medium">{source.label}</span>
+              </div>
+            ))}
+          </div>
+          <Link href="/dashboard/monitors" className="group flex items-center justify-between border-t px-4 py-3 text-[10px] font-semibold text-[var(--text-muted)] hover:text-[var(--text)]">
+            Manage monitors
+            <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </section>
+
+        <section className="overflow-hidden rounded-[10px] border bg-[var(--surface)]">
+          <div className="flex items-center gap-3 border-b px-4 py-3.5">
+            <span className="grid size-8 place-items-center rounded-[8px] bg-[var(--accent-soft)] text-[var(--accent)]">
+              <TelegramLogo size={17} weight="fill" />
+            </span>
+            <div>
+              <h2 className="text-xs font-semibold">Telegram companion</h2>
+              <p className="mt-0.5 text-[10px] text-[var(--text-faint)]">Alerts, digests, feedback, and quick actions</p>
+            </div>
+          </div>
+          <div className="p-4">
+            <p className="mb-4 text-[11px] leading-5 text-[var(--text-muted)]">
+              Link your Telegram account to receive qualified opportunities and work with the same Evee workspace away from the dashboard.
+            </p>
+            <TelegramLink initiallyConnected={Boolean(telegram)} username={telegram?.telegramUsername} />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
