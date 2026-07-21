@@ -1,5 +1,30 @@
 import type { CSSProperties } from "react";
 
+export function MiniLine({ values, label = "Recent trend" }: { values: number[]; label?: string }) {
+  const safeValues = values.length > 1
+    ? values
+    : [...Array(Math.max(0, 6 - values.length)).fill(0), ...values];
+  const maximum = Math.max(...safeValues, 1);
+  const points = safeValues.map((value, index) => {
+    const x = safeValues.length > 1 ? (index / (safeValues.length - 1)) * 88 : 44;
+    const y = 34 - (value / maximum) * 26;
+    return { x, y };
+  });
+  const pointString = points.map(({ x, y }) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const areaPath = points.length
+    ? `M 0 38 L ${points.map(({ x, y }) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L ")} L 88 38 Z`
+    : "";
+  const latest = points.at(-1);
+
+  return (
+    <svg className="h-10 w-[88px] shrink-0 overflow-visible" viewBox="0 0 88 40" role="img" aria-label={`${label}: ${safeValues.join(", ")}`}>
+      <path d={areaPath} fill="color-mix(in srgb, var(--accent) 10%, transparent)" />
+      <polyline points={pointString} fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      {latest ? <circle cx={latest.x} cy={latest.y} r="2.5" fill="var(--surface)" stroke="var(--accent)" strokeWidth="2" /> : null}
+    </svg>
+  );
+}
+
 export function MiniBars({ values, label = "Recent activity" }: { values: number[]; label?: string }) {
   const safeValues = values.length ? values : [0, 0, 0, 0, 0, 0];
   const maximum = Math.max(...safeValues, 1);
