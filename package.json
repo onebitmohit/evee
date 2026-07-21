@@ -33,7 +33,7 @@
     "@better-auth/drizzle-adapter": "latest",
     "@evee/auth": "workspace:*",
     "@evee/platform": "workspace:*",
-    "@trigger.dev/sdk": "latest",
+    "@trigger.dev/sdk": "4.5.6",
     "@google/genai": "latest",
     "@libsql/client": "latest",
     "ai": "latest",
