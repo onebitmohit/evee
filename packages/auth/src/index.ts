@@ -9,6 +9,34 @@ import {
 import { ensureWorkspaceForAuthUser } from "@evee/platform/db/workspaces";
 import { betterAuth } from "better-auth";
 
+const vercelDeploymentURL = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : undefined;
+
+// `BETTER_AUTH_URL` must be the canonical public app URL in production. Vercel
+// also supplies VERCEL_URL for each deployment, which keeps a deployment usable
+// when the canonical URL has not been configured yet. Do not carry the local
+// example URL into a hosted Vercel deployment.
+const configuredAuthURL = process.env.BETTER_AUTH_URL;
+const configuredLocalURL = /^https?:\/\/(localhost|127\.0\.0\.1)(?::\d+)?(?:\/|$)/.test(
+  configuredAuthURL ?? "",
+);
+const authBaseURL =
+  process.env.NODE_ENV === "production" && vercelDeploymentURL && configuredLocalURL
+    ? vercelDeploymentURL
+    : configuredAuthURL ?? vercelDeploymentURL ?? "http://localhost:3001";
+
+// Better Auth already reads BETTER_AUTH_TRUSTED_ORIGINS itself. Supplying the
+// same explicit list here also lets the deployment URL coexist with a custom
+// production domain, while retaining an exact allowlist for origin/CSRF checks.
+const trustedOrigins = [
+  authBaseURL,
+  vercelDeploymentURL,
+  ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") ?? []),
+]
+  .map((origin) => origin?.trim())
+  .filter((origin): origin is string => Boolean(origin));
+
 const authSecret =
   process.env.BETTER_AUTH_SECRET ??
   (process.env.NODE_ENV !== "production"
@@ -17,7 +45,8 @@ const authSecret =
 
 export const auth = betterAuth({
   appName: "Evee",
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3001",
+  baseURL: authBaseURL,
+  trustedOrigins,
   ...(authSecret ? { secret: authSecret } : {}),
   database: drizzleAdapter(db, {
     provider: "sqlite",
