@@ -3,24 +3,24 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f4f4f5;
-  --surface: #ffffff;
-  --surface-subtle: #f5f5f6;
-  --surface-strong: #ebebed;
-  --border: #e1e1e4;
-  --border-strong: #c9c9cd;
-  --text: #151517;
-  --text-muted: #65656b;
-  --text-faint: #94949a;
-  --accent: #242426;
-  --accent-hover: #111113;
-  --accent-soft: #eeeeef;
-  --accent-foreground: #f8f8f9;
+  --background: #fff2f8;
+  --surface: #fff9fc;
+  --surface-subtle: #fdf0f6;
+  --surface-strong: #f8e4ee;
+  --border: #edd8e4;
+  --border-strong: #deb8ca;
+  --text: #25131e;
+  --text-muted: #765565;
+  --text-faint: #a98496;
+  --accent: #d4236d;
+  --accent-hover: #b81758;
+  --accent-soft: #f8dce9;
+  --accent-foreground: #fff8fb;
   --success: #15805f;
   --warning: #a9650d;
   --danger: #c43d4b;
-  --chart-grid: #e7e7e9;
-  --shadow: 0 1px 2px rgb(20 24 32 / 0.035), 0 12px 32px rgb(20 24 32 / 0.045);
+  --chart-grid: #f2dce8;
+  --shadow: 0 1px 2px rgb(112 32 72 / 0.035), 0 12px 32px rgb(112 32 72 / 0.055);
 }
 
 .dark {
@@ -34,10 +34,10 @@
   --text: #f4f4f5;
   --text-muted: #9a9aa1;
   --text-faint: #65656d;
-  --accent: #ececee;
-  --accent-hover: #fafafa;
-  --accent-soft: #171719;
-  --accent-foreground: #111113;
+  --accent: #ff3f8d;
+  --accent-hover: #ff68a7;
+  --accent-soft: #381022;
+  --accent-foreground: #210812;
   --success: #68ad91;
   --warning: #c99a61;
   --danger: #d97983;
