@@ -9,6 +9,10 @@ import {
 import { ensureWorkspaceForAuthUser } from "@evee/platform/db/workspaces";
 import { betterAuth } from "better-auth";
 
+function originOf(value: string | undefined) {
+  return value ? new URL(value).origin : undefined;
+}
+
 const vercelDeploymentURL = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : undefined;
@@ -18,13 +22,14 @@ const vercelDeploymentURL = process.env.VERCEL_URL
 // when the canonical URL has not been configured yet. Do not carry the local
 // example URL into a hosted Vercel deployment.
 const configuredAuthURL = process.env.BETTER_AUTH_URL;
+const configuredAuthOrigin = originOf(configuredAuthURL);
 const configuredLocalURL = /^https?:\/\/(localhost|127\.0\.0\.1)(?::\d+)?(?:\/|$)/.test(
   configuredAuthURL ?? "",
 );
 const authBaseURL =
   process.env.NODE_ENV === "production" && vercelDeploymentURL && configuredLocalURL
     ? vercelDeploymentURL
-    : configuredAuthURL ?? vercelDeploymentURL ?? "http://localhost:3001";
+    : configuredAuthOrigin ?? vercelDeploymentURL ?? "http://localhost:3001";
 
 // Better Auth already reads BETTER_AUTH_TRUSTED_ORIGINS itself. Supplying the
 // same explicit list here also lets the deployment URL coexist with a custom
@@ -35,7 +40,8 @@ const trustedOrigins = [
   ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") ?? []),
 ]
   .map((origin) => origin?.trim())
-  .filter((origin): origin is string => Boolean(origin));
+  .filter((origin): origin is string => Boolean(origin))
+  .map((origin) => originOf(origin)!);
 
 const authSecret =
   process.env.BETTER_AUTH_SECRET ??
