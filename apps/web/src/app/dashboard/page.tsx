@@ -2,7 +2,7 @@ import { ArrowRight, ChartLineUp, Crosshair, PaperPlaneTilt, Target } from "@pho
 import { getProfile, listOpportunitiesForUser } from "@evee/platform/db/repository";
 import { getTelegramConnection, getWorkspaceDashboard } from "@evee/platform/db/workspaces";
 import Link from "next/link";
-import { HorizontalMeter, MiniBars, ScoreRing } from "@/components/metric-visuals";
+import { HorizontalMeter, MiniLine, ScoreRing } from "@/components/metric-visuals";
 import { PageHeader } from "@/components/page-header";
 import { requireWorkspace } from "@/lib/session";
 
@@ -75,10 +75,10 @@ export default async function DashboardPage() {
       } />
 
       <section className="grid overflow-hidden rounded-[10px] border bg-[var(--surface)] md:grid-cols-4">
-        <Metric label="Opportunities" value={stats.opportunities} detail="Found in the last 7 days" icon={Target} visual={<MiniBars values={runValues.map((run) => run.opportunitiesCreated)} label="Opportunities from recent scans" />} />
+        <Metric label="Opportunities" value={stats.opportunities} detail="Found in the last 7 days" icon={Target} visual={<MiniLine values={runValues.map((run) => run.opportunitiesCreated)} label="Opportunities from recent scans" />} />
         <Metric label="Average score" value={stats.averageScore || "-"} detail="Across recent opportunities" icon={ChartLineUp} visual={<ScoreRing value={stats.averageScore} size={46} label="Average opportunity score" />} />
-        <Metric label="Active monitors" value={stats.activeMonitors} detail="Scanning connected sources" icon={Crosshair} visual={<MiniBars values={runValues.map((run) => run.sourcesChecked)} label="Sources checked in recent scans" />} />
-        <Metric label="Replies sent" value={stats.replied} detail="Marked as replied this week" icon={PaperPlaneTilt} visual={<div className="w-16 pb-1"><HorizontalMeter value={stats.replied} maximum={stats.opportunities} label="Replies from recent opportunities" /></div>} />
+        <Metric label="Active monitors" value={stats.activeMonitors} detail="Scanning connected sources" icon={Crosshair} visual={<MiniLine values={runValues.map((run) => run.sourcesChecked)} label="Sources checked in recent scans" />} />
+        <Metric label="Replies tracked" value={stats.replied} detail="Marked as replied this week" icon={PaperPlaneTilt} visual={<div className="w-16 pb-1"><HorizontalMeter value={stats.replied} maximum={stats.opportunities} label="Replies from recent opportunities" /></div>} />
       </section>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(280px,0.65fr)]">
