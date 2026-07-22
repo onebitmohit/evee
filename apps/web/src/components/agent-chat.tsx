@@ -72,8 +72,8 @@ function ChatComposer({
           className={`absolute z-30 max-h-72 w-full overflow-y-auto rounded-[12px] border bg-[var(--surface)] p-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.24)] ${empty ? "top-[calc(100%+8px)]" : "bottom-[calc(100%+8px)]"}`}
         >
           <div className="flex items-center justify-between px-2.5 py-2">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--text-faint)]">Commands</p>
-            <p className="text-[8px] text-[var(--text-faint)]">↑↓ select · Enter run · Esc close</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-faint)]">Commands</p>
+            <p className="text-[9px] text-[var(--text-faint)]">↑↓ select · Enter run · Esc close</p>
           </div>
           {suggestions.map((command, index) => (
             <button
@@ -86,8 +86,8 @@ function ChatComposer({
               onClick={() => onCommand(command)}
               className={`grid w-full grid-cols-[72px_1fr] items-center gap-2 rounded-[8px] px-2.5 py-2.5 text-left active:scale-[0.99] ${index === activeIndex ? "bg-[var(--accent-soft)]" : "hover:bg-[var(--surface-subtle)]"}`}
             >
-              <code className="text-[10px] font-semibold text-[var(--accent)]">{command.name}</code>
-              <span className="truncate text-[10px] text-[var(--text-muted)]">{command.description}</span>
+              <code className="text-[11px] font-semibold text-[var(--accent)]">{command.name}</code>
+              <span className="truncate text-[11px] text-[var(--text-muted)]">{command.description}</span>
             </button>
           ))}
         </div>
@@ -105,18 +105,18 @@ function ChatComposer({
           aria-controls={suggestions.length ? "copilot-command-menu" : undefined}
           aria-activedescendant={suggestions[activeIndex] ? `copilot-command-${suggestions[activeIndex].name.slice(1)}` : undefined}
           aria-expanded={Boolean(suggestions.length)}
-          className="max-h-40 min-h-14 w-full resize-none bg-transparent px-2.5 py-2 text-[13px] leading-5 outline-none placeholder:text-[var(--text-faint)]"
+          className="max-h-40 min-h-14 w-full resize-none bg-transparent px-2.5 py-2 text-[14px] leading-5 outline-none placeholder:text-[var(--text-faint)]"
           placeholder="Ask Evee anything. Type / for commands."
         />
         <div className="flex items-center gap-2 px-1 pt-1">
           <button
             type="button"
             onClick={onShowCommands}
-            className="flex h-8 items-center gap-1.5 rounded-[8px] px-2 text-[9px] font-semibold text-[var(--text-muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text)] active:scale-[0.97]"
+            className="flex h-8 items-center gap-1.5 rounded-[8px] px-2 text-[10px] font-semibold text-[var(--text-muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text)] active:scale-[0.97]"
           >
-            <Command size={13} /><span>Commands</span><kbd className="ml-0.5 font-mono text-[8px] text-[var(--text-faint)]">/</kbd>
+            <Command size={13} /><span>Commands</span><kbd className="ml-0.5 font-mono text-[9px] text-[var(--text-faint)]">/</kbd>
           </button>
-          <span className="hidden text-[8px] text-[var(--text-faint)] sm:inline">Replies stay human-reviewed</span>
+          <span className="hidden text-[9px] text-[var(--text-faint)] sm:inline">Replies stay human-reviewed</span>
           {busy ? (
             <button type="button" onClick={onStop} aria-label="Stop streaming" className="ml-auto grid size-8 place-items-center rounded-[8px] bg-[var(--surface-strong)] active:scale-[0.97]"><Stop size={13} weight="fill" /></button>
           ) : (
@@ -236,12 +236,12 @@ export function AgentChat() {
           <div className="mb-7 text-center">
             <span className="mx-auto grid size-11 place-items-center rounded-[13px] bg-[var(--accent-soft)] text-[var(--accent)]"><Robot size={22} weight="fill" /></span>
             <h1 className="mt-4 text-2xl font-semibold tracking-[-0.045em]">Ask Evee</h1>
-            <p className="mx-auto mt-2 max-w-md text-[11px] leading-5 text-[var(--text-muted)]">Research demand, manage monitors, review opportunities, and control alerts from one conversation.</p>
+            <p className="mx-auto mt-2 max-w-md text-[12px] leading-5 text-[var(--text-muted)]">Research demand, manage monitors, review opportunities, and control alerts from one conversation.</p>
           </div>
           {composer}
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {quickActions.map((action) => (
-              <button key={action.command} type="button" onClick={() => send(action.command)} className="flex h-8 items-center gap-1.5 rounded-[8px] border bg-[var(--surface)] px-2.5 text-[9px] font-medium text-[var(--text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--text)] active:scale-[0.97]">
+              <button key={action.command} type="button" onClick={() => send(action.command)} className="flex h-8 items-center gap-1.5 rounded-[8px] border bg-[var(--surface)] px-2.5 text-[10px] font-medium text-[var(--text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--text)] active:scale-[0.97]">
                 <action.icon size={12} />{action.label}
               </button>
             ))}
@@ -251,7 +251,7 @@ export function AgentChat() {
         <>
           <div className="flex items-center gap-2 border-b pb-3">
             <span className="grid size-7 place-items-center rounded-[8px] bg-[var(--accent-soft)] text-[var(--accent)]"><Robot size={14} weight="fill" /></span>
-            <div><h1 className="text-xs font-semibold">Evee Copilot</h1><p className="text-[8px] text-[var(--text-faint)]">Connected to your workspace</p></div>
+            <div><h1 className="text-xs font-semibold">Evee Copilot</h1><p className="text-[9px] text-[var(--text-faint)]">Connected to your workspace</p></div>
           </div>
           <div className="flex-1 overflow-y-auto py-6">
             <ChatMessages messages={agent.data.messages} />
