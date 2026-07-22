@@ -72,8 +72,8 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
   const billingActive = pathname.startsWith("/dashboard/billing");
 
   const sidebar = (
-    <aside className="flex h-full w-[240px] shrink-0 flex-col bg-[var(--background)] px-3 py-3.5">
-      <div className="flex h-10 items-center justify-between px-2">
+    <aside className="flex h-full w-[248px] shrink-0 flex-col bg-[var(--background)] px-3 py-4">
+      <div className="flex h-10 items-center justify-between px-2.5">
         <Brand />
         <button
           type="button"
@@ -85,18 +85,18 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
         </button>
       </div>
 
-      <div className="mt-3 flex items-center gap-2.5 rounded-[10px] border bg-[var(--surface)] px-2.5 py-2.5 shadow-[var(--shadow)]">
-        <span className="grid size-7 shrink-0 place-items-center rounded-[8px] bg-[var(--accent-soft)] text-[11px] font-semibold text-[var(--accent)]">
+      <div className="mt-4 flex items-center gap-2.5 rounded-[12px] border bg-[var(--surface)] px-3 py-3 shadow-[var(--shadow)]">
+        <span className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-[var(--accent-soft)] text-[11px] font-semibold text-[var(--accent)]">
           {workspaceName[0]?.toUpperCase()}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-[11px] font-semibold">{workspaceName}</p>
-          <p className="mt-0.5 text-[9px] text-[var(--text-faint)]">GTM workspace</p>
+          <p className="truncate text-xs font-semibold">{workspaceName}</p>
+          <p className="mt-0.5 text-[10px] text-[var(--text-faint)]">GTM workspace</p>
         </div>
       </div>
 
-      <nav className="mt-6" aria-label="Primary navigation">
-        <p className="px-2 pb-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--text-faint)]">Workspace</p>
+      <nav className="mt-7" aria-label="Primary navigation">
+        <p className="px-2.5 pb-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--text-faint)]">Workspace</p>
         <div className="grid gap-1">
           {primaryLinks.map((item) => {
             const active = isActive(item, pathname);
@@ -106,7 +106,7 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
                 aria-current={active ? "page" : undefined}
-                className={`group flex h-9 items-center gap-3 rounded-[9px] px-2.5 text-[11px] font-medium transition-colors active:scale-[0.985] ${active ? "bg-[var(--surface-strong)] text-[var(--text)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text)]"}`}
+                className={`group flex h-10 items-center gap-3 rounded-[10px] px-3 text-xs font-medium active:scale-[0.985] ${active ? "bg-[var(--accent-soft)] text-[var(--text)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text)]"}`}
               >
                 <item.icon size={16} weight={active ? "fill" : "regular"} className={active ? "text-[var(--accent)]" : "text-[var(--text-faint)] group-hover:text-[var(--text-muted)]"} />
                 {item.label}
@@ -121,17 +121,17 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
           href="/dashboard/billing"
           onClick={() => setMobileOpen(false)}
           aria-current={billingActive ? "page" : undefined}
-          className={`mb-2 flex h-9 items-center gap-3 rounded-[9px] px-2.5 text-[11px] font-medium transition-colors active:scale-[0.985] ${billingActive ? "bg-[var(--surface-strong)] text-[var(--text)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text)]"}`}
+          className={`mb-3 flex h-10 items-center gap-3 rounded-[10px] px-3 text-xs font-medium active:scale-[0.985] ${billingActive ? "bg-[var(--accent-soft)] text-[var(--text)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text)]"}`}
         >
           <CreditCard size={16} weight={billingActive ? "fill" : "regular"} className={billingActive ? "text-[var(--accent)]" : "text-[var(--text-faint)]"} />
           Billing
         </Link>
 
-        <div className="flex items-center gap-2.5 border-t px-1.5 pt-3">
+        <div className="flex items-center gap-2.5 border-t px-1.5 pt-3.5">
           <span className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-[var(--surface-strong)] font-mono text-[10px] font-semibold">{initials}</span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[11px] font-medium">{userName}</p>
-            <p className="truncate text-[9px] text-[var(--text-faint)]">{userEmail}</p>
+            <p className="truncate text-xs font-medium">{userName}</p>
+            <p className="truncate text-[10px] text-[var(--text-faint)]">{userEmail}</p>
           </div>
           <button
             type="button"
@@ -155,13 +155,13 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
       <div className="fixed inset-y-0 left-0 z-30 hidden lg:block">{sidebar}</div>
       {mobileOpen ? (
         <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-[2px] lg:hidden" onClick={() => setMobileOpen(false)}>
-          <div className="h-full w-[240px]" onClick={(event) => event.stopPropagation()}>{sidebar}</div>
+          <div className="h-full w-[248px]" onClick={(event) => event.stopPropagation()}>{sidebar}</div>
         </div>
       ) : null}
 
-      <div className="min-w-0 flex-1 lg:pl-[240px] lg:py-2 lg:pr-2">
-        <div className="min-h-[100dvh] overflow-hidden bg-[var(--surface)] lg:min-h-[calc(100dvh-16px)] lg:rounded-[14px] lg:border lg:shadow-[var(--shadow)]">
-          <header className="sticky top-0 z-20 flex h-13 items-center justify-between border-b bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] px-4 backdrop-blur-xl sm:px-5">
+      <div className="min-w-0 flex-1 lg:pl-[248px] lg:py-2 lg:pr-2">
+        <div className="min-h-[100dvh] overflow-hidden bg-[var(--surface)] lg:min-h-[calc(100dvh-16px)] lg:rounded-[16px] lg:border lg:shadow-[var(--shadow)]">
+          <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] px-4 backdrop-blur-xl sm:px-6">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
@@ -172,13 +172,13 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
                 <CirclesThreePlus size={16} />
               </button>
               <div className="min-w-0">
-                <p className="truncate text-[11px] font-semibold">{currentLabel}</p>
-                <p className="hidden truncate text-[9px] text-[var(--text-faint)] sm:block">{workspaceName}</p>
+                <p className="truncate text-xs font-semibold">{currentLabel}</p>
+                <p className="hidden truncate text-[10px] text-[var(--text-faint)] sm:block">{workspaceName}</p>
               </div>
             </div>
             <ThemeToggle />
           </header>
-          <main className="mx-auto w-full max-w-[1480px] px-4 py-5 sm:px-5 lg:px-7 lg:py-7">{children}</main>
+          <main className="mx-auto w-full max-w-[1480px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
         </div>
       </div>
     </div>
