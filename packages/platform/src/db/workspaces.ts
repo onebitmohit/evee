@@ -97,15 +97,19 @@ export async function getWorkspaceForAuthUser(authUserId: string) {
 
 export async function getWorkspaceDashboard(runtimeUserId: string) {
   const since = now() - 7 * 24 * 60 * 60 * 1_000;
-  const [opportunityStats] = await db.select({
-    total: sql<number>`count(*)`,
-    averageScore: sql<number>`coalesce(avg(${opportunities.score}), 0)`,
-    replied: sql<number>`sum(case when ${opportunities.status} = 'replied' then 1 else 0 end)`,
-  }).from(opportunities).where(and(eq(opportunities.userId, runtimeUserId), gt(opportunities.createdAt, since)));
-  const [monitorStats] = await db.select({ active: sql<number>`count(*)` }).from(sources)
-    .where(and(eq(sources.userId, runtimeUserId), eq(sources.enabled, true)));
-  const recentRuns = await db.select().from(monitorRuns).where(eq(monitorRuns.userId, runtimeUserId))
-    .orderBy(desc(monitorRuns.startedAt)).limit(6);
+  const [opportunityRows, monitorRows, recentRuns] = await Promise.all([
+    db.select({
+      total: sql<number>`count(*)`,
+      averageScore: sql<number>`coalesce(avg(${opportunities.score}), 0)`,
+      replied: sql<number>`sum(case when ${opportunities.status} = 'replied' then 1 else 0 end)`,
+    }).from(opportunities).where(and(eq(opportunities.userId, runtimeUserId), gt(opportunities.createdAt, since))),
+    db.select({ active: sql<number>`count(*)` }).from(sources)
+      .where(and(eq(sources.userId, runtimeUserId), eq(sources.enabled, true))),
+    db.select().from(monitorRuns).where(eq(monitorRuns.userId, runtimeUserId))
+      .orderBy(desc(monitorRuns.startedAt)).limit(6),
+  ]);
+  const opportunityStats = opportunityRows[0];
+  const monitorStats = monitorRows[0];
   return {
     opportunities: Number(opportunityStats?.total ?? 0),
     averageScore: Math.round(Number(opportunityStats?.averageScore ?? 0)),
