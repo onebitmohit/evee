@@ -11,8 +11,8 @@ import {
   Robot,
   Stop,
 } from "@phosphor-icons/react";
-import { useEveAgent } from "eve/react";
-import { type KeyboardEvent, type RefObject, useRef, useState } from "react";
+import { type EveMessage, useEveAgent } from "eve/react";
+import { memo, type KeyboardEvent, type RefObject, useRef, useState } from "react";
 
 type CopilotCommand = {
   name: string;
@@ -128,6 +128,18 @@ function ChatComposer({
   );
 }
 
+const ChatMessages = memo(function ChatMessages({ messages }: { messages: readonly EveMessage[] }) {
+  return (
+    <div className="mx-auto grid max-w-2xl gap-5">
+      {messages.map((message) => (
+        <div key={message.id} className={message.role === "user" ? "ml-auto max-w-[82%] rounded-[12px] bg-[var(--accent)] px-3.5 py-2.5 text-xs leading-5 text-[var(--accent-foreground)]" : "max-w-[92%] text-xs leading-6 text-[var(--text)]"}>
+          {message.parts.map((part, index) => part.type === "text" ? <p className="whitespace-pre-wrap" key={index}>{part.text}</p> : null)}
+        </div>
+      ))}
+    </div>
+  );
+});
+
 export function AgentChat() {
   const [draft, setDraft] = useState("");
   const [activeCommandIndex, setActiveCommandIndex] = useState(0);
@@ -242,14 +254,8 @@ export function AgentChat() {
             <div><h1 className="text-xs font-semibold">Evee Copilot</h1><p className="text-[8px] text-[var(--text-faint)]">Connected to your workspace</p></div>
           </div>
           <div className="flex-1 overflow-y-auto py-6">
-            <div className="mx-auto grid max-w-2xl gap-5">
-              {agent.data.messages.map((message) => (
-                <div key={message.id} className={message.role === "user" ? "ml-auto max-w-[82%] rounded-[12px] bg-[var(--accent)] px-3.5 py-2.5 text-xs leading-5 text-[var(--accent-foreground)]" : "max-w-[92%] text-xs leading-6 text-[var(--text)]"}>
-                  {message.parts.map((part, index) => part.type === "text" ? <p className="whitespace-pre-wrap" key={index}>{part.text}</p> : null)}
-                </div>
-              ))}
-              {busy ? <div className="flex items-center gap-2 text-xs text-[var(--text-faint)]"><CircleNotch className="animate-spin" size={14} />Working across your workspace...</div> : null}
-            </div>
+            <ChatMessages messages={agent.data.messages} />
+            {busy ? <div className="mx-auto mt-5 flex max-w-2xl items-center gap-2 text-xs text-[var(--text-faint)]"><CircleNotch className="animate-spin" size={14} />Working across your workspace...</div> : null}
           </div>
           {agent.error ? <p className="mx-auto mb-2 w-full max-w-2xl rounded-[9px] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)] px-3 py-2 text-xs text-[var(--danger)]">{agent.error.message}</p> : null}
           <div className="mx-auto w-full max-w-2xl pb-1">{composer}</div>
