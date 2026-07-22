@@ -34,7 +34,7 @@ export function MiniBars({ values, label = "Recent activity" }: { values: number
       {safeValues.map((value, index) => (
         <span
           key={`${index}-${value}`}
-          className="w-1.5 rounded-[2px] bg-[var(--text-faint)] transition-colors group-hover:bg-[var(--text-muted)]"
+          className="w-1.5 rounded-[2px] bg-[var(--accent)] opacity-75 transition-opacity group-hover:opacity-100"
           style={{ height: `${Math.max(10, Math.round((value / maximum) * 100))}%`, opacity: value ? 0.9 : 0.25 }}
         />
       ))}
@@ -47,7 +47,7 @@ export function ScoreRing({ value, size = 72, label = "Score" }: { value: number
   const style = {
     width: size,
     height: size,
-    background: `conic-gradient(var(--text) ${normalized}%, var(--surface-strong) 0)`,
+    background: `conic-gradient(var(--accent) ${normalized}%, var(--surface-strong) 0)`,
   } satisfies CSSProperties;
 
   return (
@@ -62,7 +62,7 @@ export function HorizontalMeter({ value, maximum, label }: { value: number; maxi
   const width = maximum > 0 ? Math.max(value > 0 ? 4 : 0, Math.round((value / maximum) * 100)) : 0;
   return (
     <div className="h-1.5 overflow-hidden rounded-full bg-[var(--surface-strong)]" role="img" aria-label={`${label}: ${value}`}>
-      <div className="h-full rounded-full bg-[var(--text-muted)]" style={{ width: `${width}%` }} />
+      <div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${width}%` }} />
     </div>
   );
 }
