@@ -16,7 +16,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { authClient } from "@/lib/auth-client";
 
 type NavItem = {
   href: string;
@@ -86,17 +85,17 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
       </div>
 
       <div className="mt-4 flex items-center gap-2.5 rounded-[12px] border bg-[var(--surface)] px-3 py-3 shadow-[var(--shadow)]">
-        <span className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-[var(--accent-soft)] text-[11px] font-semibold text-[var(--accent)]">
+        <span className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-[var(--accent-soft)] text-[12px] font-semibold text-[var(--accent)]">
           {workspaceName[0]?.toUpperCase()}
         </span>
         <div className="min-w-0">
           <p className="truncate text-xs font-semibold">{workspaceName}</p>
-          <p className="mt-0.5 text-[10px] text-[var(--text-faint)]">GTM workspace</p>
+          <p className="mt-0.5 text-[11px] text-[var(--text-faint)]">GTM workspace</p>
         </div>
       </div>
 
       <nav className="mt-7" aria-label="Primary navigation">
-        <p className="px-2.5 pb-2 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--text-faint)]">Workspace</p>
+        <p className="px-2.5 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-faint)]">Workspace</p>
         <div className="grid gap-1">
           {primaryLinks.map((item) => {
             const active = isActive(item, pathname);
@@ -128,15 +127,16 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
         </Link>
 
         <div className="flex items-center gap-2.5 border-t px-1.5 pt-3.5">
-          <span className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-[var(--surface-strong)] font-mono text-[10px] font-semibold">{initials}</span>
+          <span className="grid size-8 shrink-0 place-items-center rounded-[9px] bg-[var(--surface-strong)] font-mono text-[11px] font-semibold">{initials}</span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium">{userName}</p>
-            <p className="truncate text-[10px] text-[var(--text-faint)]">{userEmail}</p>
+            <p className="truncate text-[11px] text-[var(--text-faint)]">{userEmail}</p>
           </div>
           <button
             type="button"
             aria-label="Sign out"
             onClick={async () => {
+              const { authClient } = await import("@/lib/auth-client");
               await authClient.signOut();
               router.push("/sign-in");
               router.refresh();
@@ -173,7 +173,7 @@ export function AppShell({ children, workspaceName, userName, userEmail }: {
               </button>
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold">{currentLabel}</p>
-                <p className="hidden truncate text-[10px] text-[var(--text-faint)] sm:block">{workspaceName}</p>
+                <p className="hidden truncate text-[11px] text-[var(--text-faint)] sm:block">{workspaceName}</p>
               </div>
             </div>
             <ThemeToggle />
