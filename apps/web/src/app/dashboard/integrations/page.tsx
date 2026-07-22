@@ -29,7 +29,7 @@ export default async function ConnectionsPage() {
         <section className="overflow-hidden rounded-[10px] border bg-[var(--surface)]">
           <div className="border-b px-4 py-3.5">
             <h2 className="text-xs font-semibold">Signal sources</h2>
-            <p className="mt-0.5 text-[10px] text-[var(--text-faint)]">Sources available when creating a monitor</p>
+            <p className="mt-0.5 text-[11px] text-[var(--text-faint)]">Sources available when creating a monitor</p>
           </div>
           <div className="grid grid-cols-2 gap-px bg-[var(--border)] sm:grid-cols-4 xl:grid-cols-2">
             {sources.map((source) => (
@@ -37,11 +37,11 @@ export default async function ConnectionsPage() {
                 <span className="grid size-8 place-items-center rounded-[8px] bg-[var(--surface-subtle)] text-[var(--text-muted)]">
                   <source.icon size={16} weight="fill" />
                 </span>
-                <span className="text-[11px] font-medium">{source.label}</span>
+                <span className="text-[12px] font-medium">{source.label}</span>
               </div>
             ))}
           </div>
-          <Link href="/dashboard/monitors" className="group flex items-center justify-between border-t px-4 py-3 text-[10px] font-semibold text-[var(--text-muted)] hover:text-[var(--text)]">
+          <Link href="/dashboard/monitors" className="group flex items-center justify-between border-t px-4 py-3 text-[11px] font-semibold text-[var(--text-muted)] hover:text-[var(--text)]">
             Manage monitors
             <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
@@ -54,11 +54,11 @@ export default async function ConnectionsPage() {
             </span>
             <div>
               <h2 className="text-xs font-semibold">Telegram companion</h2>
-              <p className="mt-0.5 text-[10px] text-[var(--text-faint)]">Alerts, digests, feedback, and quick actions</p>
+              <p className="mt-0.5 text-[11px] text-[var(--text-faint)]">Alerts, digests, feedback, and quick actions</p>
             </div>
           </div>
           <div className="p-4">
-            <p className="mb-4 text-[11px] leading-5 text-[var(--text-muted)]">
+            <p className="mb-4 text-[12px] leading-5 text-[var(--text-muted)]">
               Link your Telegram account to receive qualified opportunities and work with the same Evee workspace away from the dashboard.
             </p>
             <TelegramLink initiallyConnected={Boolean(telegram)} username={telegram?.telegramUsername} />
