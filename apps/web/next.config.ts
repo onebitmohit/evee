@@ -10,7 +10,11 @@ process.env.EVEE_REPO_ROOT ??= repoRoot;
 const nextConfig: NextConfig = {
   transpilePackages: ["@evee/auth", "@evee/platform"],
   outputFileTracingRoot: repoRoot,
-  turbopack: { root: repoRoot },
+  experimental: {
+    optimizePackageImports: ["@phosphor-icons/react"],
+  },
+  // Let Turbopack resolve from this app directory. `outputFileTracingRoot`
+  // intentionally remains the repository root for deployment tracing.
 };
 
 export default withEve(nextConfig, {
