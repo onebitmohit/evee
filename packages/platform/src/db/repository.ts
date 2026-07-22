@@ -253,6 +253,19 @@ export async function listOpportunitiesForUser(userId: string, limit = 50) {
   return rows.map((row) => storedOpportunity(row.opportunities, row.conversations));
 }
 
+export async function listOpportunityAnalyticsForUser(userId: string, limit = 500) {
+  return db.select({
+    source: conversations.source,
+    score: opportunities.score,
+    status: opportunities.status,
+    createdAt: opportunities.createdAt,
+  }).from(opportunities)
+    .innerJoin(conversations, eq(opportunities.conversationId, conversations.id))
+    .where(eq(opportunities.userId, userId))
+    .orderBy(desc(opportunities.createdAt), desc(opportunities.score))
+    .limit(limit);
+}
+
 export async function markAlerted(opportunityId: string) {
   await db.update(opportunities).set({ alertedAt: now(), status: "sent", updatedAt: now() }).where(eq(opportunities.id, opportunityId));
 }
